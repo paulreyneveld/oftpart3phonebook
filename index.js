@@ -25,6 +25,8 @@ let persons = [
     },
 ]
 
+app.use(express.json());
+
 app.get('/', (req, res) => {
     res.send('<h1>Hello World');
 })
@@ -50,6 +52,24 @@ app.get('/api/persons/:id', (req, res) => {
     else {
         res.status(404).end();
     }
+})
+
+app.post('/api/persons', (req, res) => {
+    const person = req.body; 
+    console.log(person);
+
+    if (!person.name || !person.number) {
+        return res.status(400).json({ "error": "name or number is missing" });
+    }
+
+    const nameExists = persons.find(individual => individual.name === person.name );
+    if (nameExists) {
+        return res.status(400).json({ "error": "name already exists" });
+    }
+    
+    person.id = Math.floor(Math.random() * 10000); 
+    persons = persons.concat(person);
+    res.json(person);
 })
 
 app.delete('/api/persons/:id', (req, res) => {
