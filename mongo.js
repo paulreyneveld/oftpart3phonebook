@@ -32,7 +32,7 @@ else {
         number: process.argv[4]
     });
 
-    person.save().then(resulst => {
+    person.save().then(rperson => {
         console.log(`added ${person.name} number ${person.number} to phonebook`);
         mongoose.connection.close();
     })
