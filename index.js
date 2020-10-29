@@ -6,31 +6,6 @@ const app = express();
 
 // DB Connection
 const Person = require('./models/person');
-const { response } = require('express');
-
-// let persons = [
-//     {
-//         "id": 1,
-//         "name": "Arto Hellas",
-//         "number": "040-123456",
-       
-//     },
-//     {
-//         "id": 2,
-//         "name": "Ada Lovelace",
-//         "number": "39-44-5432123"
-//     },
-//     {
-//         "id": 3,
-//         "name": "Dan Abramov",
-//         "number": "432-123432"
-//     },
-//     {
-//         "id": 4,
-//         "name": "Mary Poppendiek",
-//         "number": "413-345432"
-//     },
-// ]
 
 app.use(express.json());
 app.use(cors());
@@ -54,7 +29,16 @@ app.get('/api/persons', (req, res) => {
 
 app.get('/api/persons/:id', (req, res) => {
     const id = req.params.id;
-    Person.findById(id).then(results => res.json(results));
+    Person.findById(id)
+    .then(results => {
+        if (results) {
+            res.json(results);
+        }
+        else {
+            res.status(404).end();
+        }
+    })
+    .catch(error => next(error));
 })
 
 app.post('/api/persons', (req, res) => {
@@ -62,7 +46,7 @@ app.post('/api/persons', (req, res) => {
     console.log(body);
     console.log(body.name);
     if (body === undefined) {
-        return response.status(400).json({ error: 'No content' });
+        return res.status(400).json({ error: 'No content' });
     }
     const person = new Person({
         name: body.name,
@@ -75,10 +59,26 @@ app.post('/api/persons', (req, res) => {
 })
 
 app.delete('/api/persons/:id', (req, res) => {
-    const id = req.params.id;   
-    persons = persons.filter(person => id !== person.id);
-    res.status(204).end();
+    const id = req.params.id;
+    Person.findByIdAndRemove(id)
+    .then(result => {
+        res.status(204).end()
+    })
+    .catch(error => next(error));
 })
+
+const unknownEndpoint = (req, res) => {
+    res.status(404).send({ error: 'unknown endpoint' });
+}
+
+app.use(unknownEndpoint);
+
+const errorHandler = (error, req, res, next) => {
+    console.log(error.message);
+    next(error);
+}
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
