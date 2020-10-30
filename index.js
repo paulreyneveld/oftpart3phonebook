@@ -9,7 +9,7 @@ const Person = require('./models/person');
 
 app.use(express.json());
 app.use(cors());
-app.use(morgan('tiny'));
+// app.use(morgan('tiny'));
 
 app.get('/', (req, res) => {
     res.send('<h1>Hello World</h1>');
@@ -53,9 +53,11 @@ app.post('/api/persons', (req, res) => {
         number: body.number
     })
 
-    person.save().then(savedPerson => {
-        res.json(savedPerson);
-    })
+    person.save(err => console.log(err));
+    // .then(savedPerson => {
+    //     res.json(savedPerson);
+    // })
+    // .catch(err => console.log(err))
 })
 
 app.delete('/api/persons/:id', (req, res) => {
