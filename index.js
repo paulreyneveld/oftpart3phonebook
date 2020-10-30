@@ -1,46 +1,38 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
-const app = express(); 
+require('dotenv').config()
+const express = require('express')
+const cors = require('cors')
+const morgan = require('morgan')
+const app = express()
 
 // DB Connection
-const Person = require('./models/person');
+const Person = require('./models/person')
 
-app.use(express.static('build'));
+app.use(express.static('build'))
 
-app.use(express.json());
-app.use(cors());
-app.use(morgan('tiny'));
+app.use(express.json())
+app.use(cors())
+app.use(morgan('tiny'))
 
 app.get('/', (req, res) => {
-    res.send('<h1>Hello World</h1>');
-})
-
-app.get('/info', (req, res) => {
-    let time = new Date();
-    res.send(
-        `<p>Phonebook has info for ${persons.length} people</p>
-        <p>${time}</p>
-        `);
+    res.send('<h1>Hello World</h1>')
 })
 
 app.get('/api/persons', (req, res) => {
-    Person.find({}).then(results => res.json(results));
+    Person.find({}).then(results => res.json(results))
 })
 
 app.get('/api/persons/:id', (req, res) => {
-    const id = req.params.id;
+    const id = req.params.id
     Person.findById(id)
-    .then(results => {
-        if (results) {
-            res.json(results);
-        }
-        else {
-            res.status(404).end();
-        }
-    })
-    .catch(error => next(error));
+        .then(results => {
+            if (results) {
+                res.json(results)
+            }
+            else {
+                res.status(404).end()
+            }
+        })
+        .catch(error => next(error))
 })
 
 app.post('/api/persons', (req, res) => {
@@ -56,36 +48,35 @@ app.post('/api/persons', (req, res) => {
     })
 
     person.save()
-    .then(savedPerson => res.json(savedPerson))
-    .catch(err => {
-        // console.log(err);
-        res.status(400).json({ error: 'Name already exists' });
-    });
+        .then(savedPerson => res.json(savedPerson))
+        .catch(err => {
+            res.status(400).json({ error: 'Name already exists' });
+        })
 })
 
 app.delete('/api/persons/:id', (req, res) => {
-    const id = req.params.id;
+    const id = req.params.id
     Person.findByIdAndRemove(id)
-    .then(result => {
-        res.status(204).end()
-    })
-    .catch(error => next(error));
+        .then(result => {
+            res.status(204).end()
+        })
+        .catch(error => next(error))
 })
 
 const unknownEndpoint = (req, res) => {
-    res.status(404).send({ error: 'unknown endpoint' });
+    res.status(404).send({ error: 'unknown endpoint' })
 }
 
-app.use(unknownEndpoint);
+app.use(unknownEndpoint)
 
 const errorHandler = (error, req, res, next) => {
-    console.log(error.message);
-    next(error);
+    console.log(error.message)
+    next(error)
 }
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+    console.log(`Server running on port ${PORT}`)
 })
